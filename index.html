@@ -99,11 +99,20 @@
         @keyframes rippleSpread {
             0% {
                 transform: translate(-50%, -50%) scale(0);
-                opacity: 1;
+                opacity: 0.8;
             }
             100% {
-                transform: translate(-50%, -50%) scale(4);
+                transform: translate(-50%, -50%) scale(3);
                 opacity: 0;
+            }
+        }
+
+        /* Performance optimization for mobile */
+        @media (max-width: 768px) {
+            .ripple-effect {
+                will-change: transform, opacity;
+                transform: translateZ(0);
+                backface-visibility: hidden;
             }
         }
 
@@ -361,12 +370,30 @@
             justify-content: center;
             align-items: center;
             font-size: 48px;
-            font-weight: 700;
+            font-weight: 900;
             border-radius: 50%;
-            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
-            will-change: transform, left, top;
-            background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.3), transparent);
-            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.1);
+            /* Smooth bouncy liquid/slime movement */
+            transition: top 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
+                        left 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
+                        transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55), 
+                        opacity 0.3s ease-out;
+            will-change: transform, left, top, opacity;
+            background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.4), transparent);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            z-index: 2;
+            animation: slimeWobble 2s ease-in-out infinite;
+        }
+
+        @keyframes slimeWobble {
+            0%, 100% {
+                transform: scale(1) rotate(0deg);
+            }
+            25% {
+                transform: scale(1.02) rotate(-1deg);
+            }
+            75% {
+                transform: scale(0.98) rotate(1deg);
+            }
         }
 
         .tile::before {
@@ -377,51 +404,143 @@
             border-radius: 50%;
             background: inherit;
             z-index: -1;
-            filter: blur(15px);
-            opacity: 0.6;
-            transform: scale(1.1);
+            filter: blur(20px);
+            opacity: 0.5;
+            transform: scale(1.15);
+            animation: slimePulse 1.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes slimePulse {
+            from {
+                transform: scale(1.15);
+                opacity: 0.5;
+            }
+            to {
+                transform: scale(1.25);
+                opacity: 0.3;
+            }
         }
 
         .tile-moving {
-            transition: all 0.25s cubic-bezier(0.4, 0.0, 0.2, 1);
-            transform: scale(1.1);
+            animation: slimeBounce 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        .tile-new {
-            animation: liquidPop 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-        }
-
-        @keyframes liquidPop {
-            0% {
-                transform: scale(0);
-                opacity: 0;
-            }
-            50% {
-                transform: scale(1.3);
-                opacity: 0.8;
-            }
-            100% {
-                transform: scale(1);
-                opacity: 1;
-            }
-        }
-
-        .tile-merge {
-            animation: liquidMerge 0.6s ease-out;
-        }
-
-        @keyframes liquidMerge {
+        @keyframes slimeBounce {
             0% {
                 transform: scale(1);
             }
             30% {
-                transform: scale(1.5);
+                transform: scale(0.9, 1.1);
             }
             50% {
-                transform: scale(1.8);
+                transform: scale(1.1, 0.9);
+            }
+            70% {
+                transform: scale(0.95, 1.05);
             }
             100% {
                 transform: scale(1);
+            }
+        }
+
+        .tile-new {
+            animation: jellySpawn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes jellySpawn {
+            0% {
+                transform: scale(0) rotate(180deg);
+                opacity: 0;
+            }
+            40% {
+                transform: scale(1.3, 0.7) rotate(90deg);
+                opacity: 0.8;
+            }
+            60% {
+                transform: scale(0.8, 1.2) rotate(-20deg);
+            }
+            80% {
+                transform: scale(1.1, 0.95) rotate(5deg);
+            }
+            100% {
+                transform: scale(1) rotate(0deg);
+                opacity: 1;
+            }
+        }
+
+        .tile-merged {
+            animation: slimeFusion 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 3;
+        }
+
+        @keyframes slimeFusion {
+            0% {
+                transform: scale(1);
+            }
+            20% {
+                transform: scale(0.8, 1.2);
+            }
+            40% {
+                transform: scale(1.4, 0.8) rotate(-5deg);
+            }
+            60% {
+                transform: scale(0.9, 1.15) rotate(3deg);
+            }
+            80% {
+                transform: scale(1.05, 0.95) rotate(-1deg);
+            }
+            100% {
+                transform: scale(1) rotate(0deg);
+            }
+        }
+
+        @keyframes containerJiggle {
+            0%, 100% {
+                transform: scale(1) rotate(0deg);
+            }
+            12.5% {
+                transform: scale(1.01) rotate(0.5deg);
+            }
+            25% {
+                transform: scale(0.99) rotate(-0.5deg);
+            }
+            37.5% {
+                transform: scale(1.005) rotate(0.3deg);
+            }
+            50% {
+                transform: scale(0.995) rotate(-0.3deg);
+            }
+            62.5% {
+                transform: scale(1.002) rotate(0.1deg);
+            }
+            75% {
+                transform: scale(0.998) rotate(-0.1deg);
+            }
+            87.5% {
+                transform: scale(1.001) rotate(0deg);
+            }
+        }
+
+        /* Add sticky landing effect */
+        .tile-landing {
+            animation: stickyLand 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        @keyframes stickyLand {
+            0% {
+                transform: scale(1, 1);
+            }
+            30% {
+                transform: scale(1.15, 0.85);
+            }
+            50% {
+                transform: scale(0.95, 1.05);
+            }
+            70% {
+                transform: scale(1.02, 0.98);
+            }
+            100% {
+                transform: scale(1, 1);
             }
         }
 
@@ -822,17 +941,13 @@
         </div>
     </div>
 
-    <!-- SVG Filter for Liquid Effect -->
+    <!-- SVG Filter for Sticky Slime Fusion Effect -->
     <svg style="position: absolute; width: 0; height: 0; overflow: hidden;">
         <defs>
             <filter id="liquid-fusion">
-                <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="blur" />
-                <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 20 -9" result="goo" />
-                <feBlend in="SourceGraphic" in2="goo" />
-            </filter>
-            <filter id="liquid-fusion-strong">
-                <feGaussianBlur in="SourceGraphic" stdDeviation="12" result="blur" />
-                <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 25 -12" result="goo" />
+                <feGaussianBlur in="SourceGraphic" stdDeviation="15" result="blur" />
+                <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 30 -15" result="goo" />
+                <feComposite in="goo" in2="goo" operator="atop"/>
                 <feBlend in="SourceGraphic" in2="goo" />
             </filter>
         </defs>
@@ -845,7 +960,8 @@
                 this.score = 0;
                 this.best = parseInt(localStorage.getItem('best2048') || '0');
                 this.size = 4;
-                this.tileElements = new Map();
+                this.tileIdCounter = 0;
+                this.tiles = new Map();
                 this.isMoving = false;
                 this.hasWon = false;
                 
@@ -855,15 +971,16 @@
             }
 
             init() {
-                this.grid = Array(this.size).fill().map(() => Array(this.size).fill(0));
+                this.grid = Array(this.size).fill().map(() => Array(this.size).fill(null));
                 this.score = 0;
                 this.hasWon = false;
+                this.tileIdCounter = 0;
+                this.tiles.clear();
                 this.updateScore();
                 this.clearBoard();
                 this.setupTilesContainer();
                 this.addNewTile();
                 this.addNewTile();
-                this.render();
             }
 
             setupTilesContainer() {
@@ -992,40 +1109,54 @@
                 }
                 
                 if (this.hasGridChanged(previousGrid)) {
-                    this.addNewTile();
+                    // Render tiles with bouncy slime animation
                     this.render();
-                    this.updateScore();
                     
-                    if (this.checkWin() && !this.hasWon) {
-                        this.hasWon = true;
-                        setTimeout(() => {
-                            this.showGameOver('You Win!');
-                        }, 500);
-                    } else if (this.checkGameOver()) {
-                        setTimeout(() => {
-                            this.showGameOver('Game Over!');
-                        }, 500);
-                    }
+                    // Add jiggly effect to tiles container
+                    const tilesContainer = document.getElementById('tilesContainer');
+                    tilesContainer.style.animation = 'containerJiggle 0.5s ease-out';
+                    setTimeout(() => {
+                        tilesContainer.style.animation = '';
+                    }, 500);
+                    
+                    // Add new tile after bouncy movement settles
+                    setTimeout(() => {
+                        this.addNewTile();
+                        this.updateScore();
+                        
+                        if (this.checkWin() && !this.hasWon) {
+                            this.hasWon = true;
+                            setTimeout(() => {
+                                this.showGameOver('You Win!');
+                            }, 500);
+                        } else if (this.checkGameOver()) {
+                            setTimeout(() => {
+                                this.showGameOver('Game Over!');
+                            }, 500);
+                        }
+                    }, 450);
                 }
                 
                 setTimeout(() => {
                     this.isMoving = false;
-                }, 150);
+                }, 500);
             }
 
             moveLeft() {
                 for (let row = 0; row < this.size; row++) {
-                    const filtered = this.grid[row].filter(val => val !== 0);
-                    const merged = this.merge(filtered);
-                    this.grid[row] = merged.concat(Array(this.size - merged.length).fill(0));
+                    const filtered = this.grid[row].filter(tile => tile && tile.value);
+                    const merged = this.mergeTiles(filtered);
+                    const newRow = merged.concat(Array(this.size - merged.length).fill(null));
+                    this.grid[row] = newRow;
                 }
             }
 
             moveRight() {
                 for (let row = 0; row < this.size; row++) {
-                    const filtered = this.grid[row].filter(val => val !== 0);
-                    const merged = this.merge(filtered);
-                    this.grid[row] = Array(this.size - merged.length).fill(0).concat(merged);
+                    const filtered = this.grid[row].filter(tile => tile && tile.value);
+                    const merged = this.mergeTiles(filtered);
+                    const newRow = Array(this.size - merged.length).fill(null).concat(merged);
+                    this.grid[row] = newRow;
                 }
             }
 
@@ -1035,9 +1166,9 @@
                     for (let row = 0; row < this.size; row++) {
                         column.push(this.grid[row][col]);
                     }
-                    const filtered = column.filter(val => val !== 0);
-                    const merged = this.merge(filtered);
-                    const newColumn = merged.concat(Array(this.size - merged.length).fill(0));
+                    const filtered = column.filter(tile => tile && tile.value);
+                    const merged = this.mergeTiles(filtered);
+                    const newColumn = merged.concat(Array(this.size - merged.length).fill(null));
                     for (let row = 0; row < this.size; row++) {
                         this.grid[row][col] = newColumn[row];
                     }
@@ -1050,27 +1181,39 @@
                     for (let row = 0; row < this.size; row++) {
                         column.push(this.grid[row][col]);
                     }
-                    const filtered = column.filter(val => val !== 0);
-                    const merged = this.merge(filtered);
-                    const newColumn = Array(this.size - merged.length).fill(0).concat(merged);
+                    const filtered = column.filter(tile => tile && tile.value);
+                    const merged = this.mergeTiles(filtered);
+                    const newColumn = Array(this.size - merged.length).fill(null).concat(merged);
                     for (let row = 0; row < this.size; row++) {
                         this.grid[row][col] = newColumn[row];
                     }
                 }
             }
 
-            merge(arr) {
+            mergeTiles(tiles) {
                 const result = [];
                 let i = 0;
                 
-                while (i < arr.length) {
-                    if (i === arr.length - 1 || arr[i] !== arr[i + 1]) {
-                        result.push(arr[i]);
+                while (i < tiles.length) {
+                    if (i === tiles.length - 1 || tiles[i].value !== tiles[i + 1].value) {
+                        result.push(tiles[i]);
                         i++;
                     } else {
-                        const merged = arr[i] * 2;
-                        result.push(merged);
-                        this.score += merged;
+                        const mergedValue = tiles[i].value * 2;
+                        const newTile = {
+                            id: this.tileIdCounter++,
+                            value: mergedValue,
+                            row: tiles[i].row,
+                            col: tiles[i].col,
+                            merged: true
+                        };
+                        result.push(newTile);
+                        this.score += mergedValue;
+                        
+                        // Mark old tiles for removal with animation
+                        tiles[i].toRemove = true;
+                        tiles[i + 1].toRemove = true;
+                        
                         i += 2;
                     }
                 }
@@ -1082,7 +1225,7 @@
                 const emptyCells = [];
                 for (let row = 0; row < this.size; row++) {
                     for (let col = 0; col < this.size; col++) {
-                        if (this.grid[row][col] === 0) {
+                        if (!this.grid[row][col] || this.grid[row][col] === 0) {
                             emptyCells.push({ row, col });
                         }
                     }
@@ -1090,14 +1233,61 @@
                 
                 if (emptyCells.length > 0) {
                     const randomCell = emptyCells[Math.floor(Math.random() * emptyCells.length)];
-                    this.grid[randomCell.row][randomCell.col] = Math.random() < 0.9 ? 2 : 4;
+                    const value = Math.random() < 0.9 ? 2 : 4;
+                    const tileId = this.tileIdCounter++;
+                    const tile = { id: tileId, value, row: randomCell.row, col: randomCell.col };
+                    this.grid[randomCell.row][randomCell.col] = tile;
+                    this.createTileElement(tile);
                 }
+            }
+
+            createTileElement(tile) {
+                const tilesContainer = document.getElementById('tilesContainer');
+                const gameBoard = document.getElementById('gameBoard');
+                const boardRect = gameBoard.getBoundingClientRect();
+                const padding = 10;
+                const gap = 10;
+                const cellSize = (boardRect.width - padding * 2 - gap * 3) / 4;
+                
+                const tileEl = document.createElement('div');
+                tileEl.dataset.id = tile.id;
+                tileEl.className = `tile tile-${tile.value} tile-new`;
+                tileEl.textContent = tile.value;
+                
+                const left = padding + tile.col * (cellSize + gap);
+                const top = padding + tile.row * (cellSize + gap);
+                
+                tileEl.style.width = `${cellSize}px`;
+                tileEl.style.height = `${cellSize}px`;
+                tileEl.style.left = `${left}px`;
+                tileEl.style.top = `${top}px`;
+                
+                tilesContainer.appendChild(tileEl);
+                this.tiles.set(tile.id, tileEl);
+                
+                // Animate tile appearance - jelly spawn effect
+                setTimeout(() => {
+                    tileEl.classList.remove('tile-new');
+                    // Add subtle idle wobble after spawn
+                    setTimeout(() => {
+                        tileEl.style.animation = 'slimeWobble 2s ease-in-out infinite';
+                    }, 600);
+                }, 600);
+                
+                return tileEl;
             }
 
             hasGridChanged(previousGrid) {
                 for (let row = 0; row < this.size; row++) {
                     for (let col = 0; col < this.size; col++) {
-                        if (this.grid[row][col] !== previousGrid[row][col]) {
+                        const current = this.grid[row][col];
+                        const previous = previousGrid[row][col];
+                        
+                        // Handle both object tiles and numeric values
+                        const currentValue = current?.value || current || 0;
+                        const previousValue = previous?.value || previous || 0;
+                        
+                        if (currentValue !== previousValue) {
                             return true;
                         }
                     }
@@ -1108,7 +1298,8 @@
             checkWin() {
                 for (let row = 0; row < this.size; row++) {
                     for (let col = 0; col < this.size; col++) {
-                        if (this.grid[row][col] === 2048) {
+                        const tile = this.grid[row][col];
+                        if (tile && tile.value === 2048) {
                             return true;
                         }
                     }
@@ -1120,7 +1311,7 @@
                 // Check for empty cells
                 for (let row = 0; row < this.size; row++) {
                     for (let col = 0; col < this.size; col++) {
-                        if (this.grid[row][col] === 0) {
+                        if (!this.grid[row][col] || !this.grid[row][col].value) {
                             return false;
                         }
                     }
@@ -1130,15 +1321,22 @@
                 for (let row = 0; row < this.size; row++) {
                     for (let col = 0; col < this.size; col++) {
                         const current = this.grid[row][col];
+                        if (!current) continue;
                         
                         // Check right
-                        if (col < this.size - 1 && current === this.grid[row][col + 1]) {
-                            return false;
+                        if (col < this.size - 1) {
+                            const right = this.grid[row][col + 1];
+                            if (right && current.value === right.value) {
+                                return false;
+                            }
                         }
                         
                         // Check down
-                        if (row < this.size - 1 && current === this.grid[row + 1][col]) {
-                            return false;
+                        if (row < this.size - 1) {
+                            const down = this.grid[row + 1][col];
+                            if (down && current.value === down.value) {
+                                return false;
+                            }
                         }
                     }
                 }
@@ -1152,7 +1350,7 @@
                     const existingTiles = tilesContainer.querySelectorAll('.tile');
                     existingTiles.forEach(tile => tile.remove());
                 }
-                this.tileElements.clear();
+                this.tiles.clear();
             }
 
             render() {
@@ -1163,98 +1361,90 @@
                 const gap = 10;
                 const cellSize = (boardRect.width - padding * 2 - gap * 3) / 4;
                 
-                // Track which tiles need to be updated
-                const currentTiles = new Set();
-                const newTiles = new Set();
-                let hasMerged = false;
-                
+                // Update positions for all tiles in grid
                 for (let row = 0; row < this.size; row++) {
                     for (let col = 0; col < this.size; col++) {
-                        const value = this.grid[row][col];
-                        if (value !== 0) {
-                            const tileId = `${row}-${col}`;
-                            currentTiles.add(tileId);
+                        const tile = this.grid[row][col];
+                        if (tile && tile.value) {
+                            // Update tile row/col
+                            tile.row = row;
+                            tile.col = col;
                             
-                            let tileElement = this.tileElements.get(tileId);
-                            const isNew = !tileElement;
-                            
-                            if (!tileElement) {
-                                tileElement = document.createElement('div');
-                                tileElement.className = 'tile';
-                                tilesContainer.appendChild(tileElement);
-                                this.tileElements.set(tileId, tileElement);
-                                newTiles.add(tileId);
-                            }
-                            
-                            const previousValue = tileElement.dataset.value;
-                            const tileMerged = previousValue && parseInt(previousValue) !== value;
-                            
-                            if (tileMerged) {
-                                hasMerged = true;
-                            }
-                            
-                            tileElement.className = `tile tile-${value}`;
-                            if (isNew) {
-                                tileElement.classList.add('tile-new');
-                            } else if (tileMerged) {
-                                tileElement.classList.add('tile-merge');
-                                // Remove merge class after animation
-                                setTimeout(() => {
-                                    tileElement.classList.remove('tile-merge');
-                                }, 600);
-                            }
-                            
-                            tileElement.textContent = value;
-                            tileElement.dataset.value = value;
-                            tileElement.style.width = `${cellSize}px`;
-                            tileElement.style.height = `${cellSize}px`;
-                            
-                            const newLeft = `${padding + col * (cellSize + gap)}px`;
-                            const newTop = `${padding + row * (cellSize + gap)}px`;
-                            
-                            // Add liquid movement animation for position changes
-                            if (tileElement.style.left && tileElement.style.left !== newLeft ||
-                                tileElement.style.top && tileElement.style.top !== newTop) {
-                                tileElement.classList.add('tile-moving');
-                                setTimeout(() => {
-                                    tileElement.classList.remove('tile-moving');
-                                }, 400);
-                            }
-                            
-                            tileElement.style.left = newLeft;
-                            tileElement.style.top = newTop;
-                            
-                            // Add idle floating animation after a delay
-                            if (!isNew && !hasMerged) {
-                                setTimeout(() => {
-                                    if (!tileElement.classList.contains('tile-moving') && 
-                                        !tileElement.classList.contains('tile-merge')) {
-                                        tileElement.classList.add('tile-idle');
-                                    }
-                                }, 600);
+                            // Get or create tile element
+                            let tileEl = this.tiles.get(tile.id);
+                            if (!tileEl) {
+                                // Create new tile element for merged tiles
+                                tileEl = this.createTileElement(tile);
+                            } else {
+                                // Update existing tile position with smooth animation
+                                const left = padding + col * (cellSize + gap);
+                                const top = padding + row * (cellSize + gap);
+                                
+                                // Check if tile is actually moving
+                                const oldLeft = parseFloat(tileEl.style.left);
+                                const oldTop = parseFloat(tileEl.style.top);
+                                const isMoving = Math.abs(oldLeft - left) > 5 || Math.abs(oldTop - top) > 5;
+                                
+                                if (isMoving) {
+                                    // Add bouncy movement class
+                                    tileEl.classList.add('tile-moving');
+                                    setTimeout(() => {
+                                        tileEl.classList.remove('tile-moving');
+                                        tileEl.classList.add('tile-landing');
+                                        setTimeout(() => {
+                                            tileEl.classList.remove('tile-landing');
+                                        }, 400);
+                                    }, 500);
+                                }
+                                
+                                tileEl.style.left = `${left}px`;
+                                tileEl.style.top = `${top}px`;
+                                tileEl.style.width = `${cellSize}px`;
+                                tileEl.style.height = `${cellSize}px`;
+                                
+                                // Update tile appearance if merged
+                                if (tile.merged) {
+                                    tileEl.className = `tile tile-${tile.value} tile-merged`;
+                                    tileEl.textContent = tile.value;
+                                    
+                                    // Remove merge animation after completion
+                                    setTimeout(() => {
+                                        tileEl.classList.remove('tile-merged');
+                                    }, 700);
+                                    
+                                    delete tile.merged;
+                                }
                             }
                         }
                     }
                 }
                 
-                // Apply stronger liquid fusion effect during merges
-                if (hasMerged) {
-                    tilesContainer.classList.add('merging');
-                    setTimeout(() => {
-                        tilesContainer.classList.remove('merging');
-                    }, 600);
-                }
-                
-                // Remove tiles that are no longer needed with fade out
-                for (const [tileId, element] of this.tileElements) {
-                    if (!currentTiles.has(tileId)) {
-                        element.style.animation = 'liquidPop 0.3s ease-out reverse';
-                        setTimeout(() => {
-                            element.remove();
-                            this.tileElements.delete(tileId);
-                        }, 300);
+                // Remove tiles marked for removal with water droplet animation
+                const tilesToRemove = [];
+                this.tiles.forEach((tileEl, tileId) => {
+                    let found = false;
+                    for (let row = 0; row < this.size; row++) {
+                        for (let col = 0; col < this.size; col++) {
+                            const tile = this.grid[row][col];
+                            if (tile && tile.id === tileId) {
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (found) break;
                     }
-                }
+                    
+                    if (!found) {
+                        tilesToRemove.push(tileId);
+                        tileEl.style.opacity = '0';
+                        tileEl.style.transform = 'scale(0)';
+                        setTimeout(() => {
+                            tileEl.remove();
+                            this.tiles.delete(tileId);
+                        }, 200);
+                    }
+                });
+
             }
 
             updateScore() {
@@ -1277,13 +1467,17 @@
                 const rect = button.getBoundingClientRect();
                 const rippleContainer = document.getElementById('rippleContainer');
                 
-                // Create multiple ripples for an insane effect
-                for (let i = 0; i < 3; i++) {
-                    setTimeout(() => {
+                // Detect if mobile for performance optimization
+                const isMobile = window.innerWidth <= 768;
+                const rippleCount = isMobile ? 1 : 2;
+                
+                // Create optimized ripples
+                for (let i = 0; i < rippleCount; i++) {
+                    requestAnimationFrame(() => {
                         const ripple = document.createElement('div');
                         ripple.className = 'ripple-effect';
                         
-                        const size = Math.max(window.innerWidth, window.innerHeight) * 3;
+                        const size = Math.max(window.innerWidth, window.innerHeight) * 2.5;
                         const isDark = document.body.classList.contains('dark-mode');
                         
                         ripple.style.width = size + 'px';
@@ -1294,21 +1488,24 @@
                         if (isDark) {
                             // Transitioning to light mode
                             ripple.style.background = `radial-gradient(circle, 
-                                ${i === 0 ? '#faf8ef' : i === 1 ? 'rgba(250, 248, 239, 0.8)' : 'rgba(250, 248, 239, 0.5)'} 0%, 
-                                transparent 70%)`;
+                                ${i === 0 ? '#faf8ef' : 'rgba(250, 248, 239, 0.7)'} 0%, 
+                                transparent 60%)`;
                         } else {
                             // Transitioning to dark mode
                             ripple.style.background = `radial-gradient(circle, 
-                                ${i === 0 ? '#1a1a2e' : i === 1 ? 'rgba(26, 26, 46, 0.8)' : 'rgba(26, 26, 46, 0.5)'} 0%, 
-                                transparent 70%)`;
+                                ${i === 0 ? '#1a1a2e' : 'rgba(26, 26, 46, 0.7)'} 0%, 
+                                transparent 60%)`;
                         }
+                        
+                        // Use GPU acceleration
+                        ripple.style.transform = 'translate(-50%, -50%) translateZ(0)';
                         
                         rippleContainer.appendChild(ripple);
                         
                         setTimeout(() => {
                             ripple.remove();
-                        }, 1500);
-                    }, i * 100);
+                        }, 1200);
+                    });
                 }
             }
 
